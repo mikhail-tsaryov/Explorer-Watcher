@@ -1,4 +1,38 @@
-**ExplorerTrayWatcher** — удобная системная утилита для Windows, которая работает в системном трее и автоматически отслеживает открытые окна проводника (Explorer), запоминая последние открытые папки и позволяя быстро восстанавливать их при необходимости.
+**Explorer Watcher** is a convenient Windows system utility that runs in the system tray and automatically monitors open Explorer windows, remembering the most recently opened folders and allowing quick restoration when needed.
+
+## Key Features
+
+* **Automatic monitoring** of open Explorer windows every 20 seconds.
+* **Saving paths** of the most recently opened folders to a file.
+* **Quick access** to recent folders via the tray icon context menu.
+* **Restoring Explorer windows** — reopening previously saved folders.
+* **Countdown timer** showing time until the next check and update of open windows.
+* Ability to **view and edit** the saved list of paths using a standard text editor.
+* **Clearing the saved list** with a single click.
+* Support for activating and restoring minimized Explorer windows.
+
+## Usage
+
+1. Run the program — the icon will appear in the system tray.
+2. Right-click the icon to open the context menu. You will see a list of recently opened folders that you can open or activate with one click.
+3. Use the **Restore Windows** option to reopen all saved Explorer windows.
+4. Open or clear the saved list of paths via the corresponding menu options.
+5. To exit the program, select **Exit**.
+
+## Requirements
+
+* Windows 7 or later.
+* .NET Framework (version depends on the build, e.g., .NET Framework 4.7.2 or higher).
+
+## Implementation Details
+
+* Uses the COM interface `SHDocVw.ShellWindows` to get the list of Explorer windows.
+* Developed in C# using WinForms for the tray icon and context menu.
+* Saved paths file location: `%TEMP%\ExplorerWatcher\last_paths.txt`.
+
+---
+
+**Explorer Watcher** — удобная системная утилита для Windows, которая работает в системном трее и автоматически отслеживает открытые окна проводника (Explorer), запоминая последние открытые папки и позволяя быстро восстанавливать их при необходимости.
 
 ## Основные возможности
 
