@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using SHDocVw;
 using System.Drawing;
 
-namespace ExplorerTrayWatcher
+namespace ExplorerWatcher
 {
     static class Program
     {
