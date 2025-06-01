@@ -63,9 +63,19 @@ namespace Explorer_Watcher.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon EW {
+        internal static System.Drawing.Icon EW_active {
             get {
-                object obj = ResourceManager.GetObject("EW", resourceCulture);
+                object obj = ResourceManager.GetObject("EW_active", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
+        /// </summary>
+        internal static System.Drawing.Icon EW_no_active {
+            get {
+                object obj = ResourceManager.GetObject("EW_no_active", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
