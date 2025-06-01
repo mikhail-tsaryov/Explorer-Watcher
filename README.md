@@ -2,14 +2,17 @@
 
 ## Key Features
 
-* **Automatic monitoring** of open Explorer windows every 20 seconds.
+* **Automatic monitoring** of open Explorer windows every 60 seconds.
 * **Saving paths** of the most recently opened folders to a file.
 * **Quick access** to recent folders via the tray icon context menu.
 * **Restoring Explorer windows** — reopening previously saved folders.
 * **Countdown timer** showing time until the next check and update of open windows.
 * Ability to **view and edit** the saved list of paths using a standard text editor.
 * **Clearing the saved list** with a single click.
-* Support for activating and restoring minimized Explorer windows.
+
+## Indicators
+* **Active (blue icon)** – Explorer windows are open.
+* **Inactive (red icon)** – No Explorer windows detected.
 
 ## Usage
 
@@ -36,14 +39,18 @@
 
 ## Основные возможности
 
-* **Автоматический мониторинг** открытых окон проводника с периодом 20 секунд.
+* **Автоматический мониторинг** открытых окон проводника с периодом 60 секунд.
 * **Запоминание путей** последних открытых папок и сохранение их в файл.
 * **Быстрый доступ** к последним папкам через контекстное меню иконки в трее.
 * **Восстановление окон проводника** — повторное открытие ранее запомненных папок.
 * **Отсчет времени** до следующей проверки и обновления списка открытых окон.
 * Возможность **просмотра и редактирования** сохраненного списка путей через стандартный текстовый редактор.
 * **Очистка сохранённого списка** одним кликом.
-* Поддержка активации и восстановления свернутых окон проводника.
+
+## Индикаторы
+
+* **Активно (синяя иконка)** - Окна проводника открыты.
+* **Неактивно (красная иконка)** - Проводник не обнаружен.
 
 ## Использование
 
