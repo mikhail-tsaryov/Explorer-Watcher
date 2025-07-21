@@ -346,6 +346,7 @@ namespace Explorer_Watcher
                 UpdateSaveLocationMenu();
                 AppSettings.SetParameter("SaveLocation", location);
                 AppSettings.Save();
+                SaveCurrentExplorerWindows();
             };
             saveLocationMenu.DropDownItems.Add(item);
         }

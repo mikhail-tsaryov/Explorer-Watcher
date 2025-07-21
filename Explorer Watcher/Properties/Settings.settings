@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="SaveLocation" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">temp</Value>
     </Setting>
     <Setting Name="AutoSaveIntervalSeconds" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">60</Value>

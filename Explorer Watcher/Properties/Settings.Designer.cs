@@ -25,7 +25,7 @@ namespace Explorer_Watcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("temp")]
         public string SaveLocation {
             get {
                 return ((string)(this["SaveLocation"]));
