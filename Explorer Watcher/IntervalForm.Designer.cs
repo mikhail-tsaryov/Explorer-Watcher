@@ -1,6 +1,6 @@
 ﻿namespace Explorer_Watcher
 {
-    partial class Form1
+    partial class IntervalForm
     {
         /// <summary>
         /// Обязательная переменная конструктора.

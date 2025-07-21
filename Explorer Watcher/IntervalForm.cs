@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace Explorer_Watcher
 {
-    public partial class Form1 : Form
+    public partial class IntervalForm : Form
     {
-        public Form1()
+        public IntervalForm()
         {
             InitializeComponent();
         }

@@ -10,24 +10,27 @@ using System.Windows.Forms;
 using SHDocVw;
 using System.Drawing;
 
-namespace ExplorerWatcher
+namespace Explorer_Watcher
 {
     static class Program
     {
         private static readonly Icon iconActive = Explorer_Watcher.Properties.Resources.EW_active;
         private static readonly Icon iconInactive = Explorer_Watcher.Properties.Resources.EW_no_active;
+        public static ApplicationSettings AppSettings = new ApplicationSettings();
 
-        private const int AutoSaveIntervalSeconds = 60;
-        private const int AutoSaveIntervalMilliseconds = AutoSaveIntervalSeconds * 1000;
+        private static uint AutoSaveIntervalSeconds = 60;
+        private static uint AutoSaveIntervalMilliseconds = AutoSaveIntervalSeconds * 1000;
+
+        static private ToolStripMenuItem intervalMenu = new ToolStripMenuItem("Interval");
+        static private ToolStripMenuItem customIntervalItem;
 
         static NotifyIcon trayIcon;
         static List<string> lastPaths = new List<string>();
         static List<string> lastSavedPaths = new List<string>();
-        private static readonly string saveFilePath = Path.Combine(Path.GetTempPath(), "ExplorerWatcher", "last_paths.txt");
+        private static string SaveLocation = Path.Combine(Path.GetTempPath(), "ExplorerWatcher", "last_paths.txt");
         static System.Timers.Timer checkTimer;
         static ToolStripMenuItem restoreItem;
-        static int countdown = AutoSaveIntervalSeconds;
-        static readonly bool countdownActive = false;
+        static uint countdown = AutoSaveIntervalSeconds;
         static System.Windows.Forms.Timer uiTimer;
         static bool explorerRunning = false;
         static ContextMenuStrip contextMenu;
@@ -90,11 +93,27 @@ namespace ExplorerWatcher
                 }
 
                 UpdateIcon();
+
+                UpdateIntervalMenu();
             };
 
             uiTimer.Start();
 
+            AutoSaveIntervalSeconds = AppSettings.GetParameter<uint>("AutoSaveIntervalSeconds");
+
+            var saveLocation = AppSettings.GetParameter<string>("SaveLocation");
+
+            if (saveLocation == "temp")
+            {
+                SaveLocation = Path.Combine(Path.GetTempPath(), "ExplorerWatcher", "last_paths.txt");
+            }
+            else if (saveLocation == "program")
+            {
+                SaveLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "last_paths.txt");
+            }
+
             countdown = AutoSaveIntervalSeconds;
+            UpdateIntervalMenu();
 
             InitExplorerWindowWatcher();
 
@@ -135,7 +154,10 @@ namespace ExplorerWatcher
                         {
                             path = new Uri(window.LocationURL).LocalPath;
                         }
-                        catch { }
+                        catch (UriFormatException)
+                        {
+                            Debug.WriteLine("Path is empty\r\n");
+                        }
 
                         if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
                         {
@@ -197,6 +219,7 @@ namespace ExplorerWatcher
             }
 
             BuildContextMenu();
+
             UpdateCountdown();
         }
 
@@ -253,6 +276,48 @@ namespace ExplorerWatcher
             };
             contextMenu.Items.Add(countdownMenuItem);
 
+            // Добавляем меню выбора интервала
+            var intervalMenu = new ToolStripMenuItem("Autosave interval");
+
+            void AddPreset(string label, uint seconds)
+            {
+                var item = new ToolStripMenuItem(label) { Tag = seconds };
+                item.CheckOnClick = true;  
+                item.Click += (s, e) =>
+                {
+                    AutoSaveIntervalSeconds = seconds;
+                    countdown = AutoSaveIntervalSeconds;
+                    UpdateIntervalMenu(); // обновит галочки и надписи
+                };
+                intervalMenu.DropDownOpening += (sender, e) => UpdateIntervalMenu();
+                intervalMenu.DropDownItems.Add(item);
+            }
+
+            // Предустановленные интервалы
+            AddPreset("30 sec", 30);
+            AddPreset("1 min", 60);
+            AddPreset("2 min", 120);
+            AddPreset("5 min", 300);
+
+            intervalMenu.DropDownItems.Add(new ToolStripSeparator());
+            /*
+            // Кастомный интервал
+            customIntervalItem = new ToolStripMenuItem("Custom: ...");
+            customIntervalItem.Click += (s, e) =>
+            {
+                IntervalForm intervalForm = new IntervalForm(AutoSaveIntervalSeconds);
+                using var form = intervalForm;
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    AutoSaveIntervalSeconds = form.IntervalSeconds;
+                    countdown = AutoSaveIntervalSeconds;
+                    UpdateIntervalMenu();
+                }
+            };
+            intervalMenu.DropDownItems.Add(customIntervalItem);*/
+
+            contextMenu.Items.Add(intervalMenu);
+
             contextMenu.Items.Add(new ToolStripSeparator());
 
             restoreItem = new ToolStripMenuItem("Restore windows");
@@ -273,7 +338,36 @@ namespace ExplorerWatcher
             contextMenu.Items.Add("Exit", null, (s, e) => Exit());
 
             UpdateCountdown();
+            UpdateIntervalMenu();
         }
+
+        static void UpdateIntervalMenu()
+        {
+            // Обновляем предустановки
+            foreach (ToolStripMenuItem item in intervalMenu.DropDownItems)
+            {
+                if (item.Tag is uint seconds)
+                {
+                    item.Checked = (seconds == AutoSaveIntervalSeconds);
+                }
+            }
+            /*
+            // Обновляем кастомный пункт (если используется)
+            if (customIntervalItem != null)
+            {
+                customIntervalItem.Text = $"Custom: {FormatSeconds(AutoSaveIntervalSeconds)}";
+                customIntervalItem.Checked = !intervalMenu.DropDownItems
+                    .OfType<ToolStripMenuItem>()
+                    .Any(i => i.Checked);
+            }*/
+        }
+        private static string FormatSeconds(uint seconds)
+        {
+            return seconds < 60
+                ? $"{seconds} sec"
+                : $"{seconds / 60} min";
+        }
+
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -300,7 +394,7 @@ namespace ExplorerWatcher
                         {
                             windowPath = new Uri(window.LocationURL).LocalPath;
                         }
-                        catch { }
+                        catch (UriFormatException) { Debug.WriteLine("Path is empty\r\n"); }
 
                         if (string.Equals(windowPath.TrimEnd(Path.DirectorySeparatorChar), path.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
                         {
@@ -316,7 +410,7 @@ namespace ExplorerWatcher
                 if (Directory.Exists(path))
                     Process.Start("explorer.exe", path);
             }
-            catch { }
+            catch (UriFormatException) { Debug.WriteLine("Path is empty\r\n"); }
         }
 
         static void UpdateCountdown()
@@ -333,7 +427,7 @@ namespace ExplorerWatcher
             }
 
             countdownMenuItem.Text = $"Next autosave will be in {countdown}s";
-            trayIcon.Text = $"Explorer Watcher: Autosave will be in {countdown}s. Double click to save";
+            trayIcon.Text = $"ExplorerWatcher: Autosave will be in {countdown}s. Double click to save";
 
             UpdateIcon();
         }
@@ -407,7 +501,10 @@ namespace ExplorerWatcher
                         {
                             path = new Uri(window.LocationURL).LocalPath;
                         }
-                        catch { }
+                        catch (UriFormatException)
+                        {
+                            Debug.WriteLine("Path is empty\r\n");
+                        }
 
                         if (!string.IsNullOrWhiteSpace(path))
                             openPaths.Add(path.TrimEnd(Path.DirectorySeparatorChar));
@@ -422,20 +519,23 @@ namespace ExplorerWatcher
                     }
                 }
             }
-            catch { }
+            catch (UriFormatException) 
+            { 
+                Debug.WriteLine("Path is empty\r\n");
+            }
         }
 
         static void SaveLastPaths()
         {
             try
             {
-                var dir = Path.GetDirectoryName(saveFilePath);
+                var dir = Path.GetDirectoryName(SaveLocation);
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
 
-                File.WriteAllLines(saveFilePath, lastPaths);
+                File.WriteAllLines(SaveLocation, lastPaths);
             }
-            catch { }
+            catch (UriFormatException) { Debug.WriteLine("Path is empty\r\n"); }
         }
 
         static void UpdateExplorerWindows()
@@ -460,7 +560,10 @@ namespace ExplorerWatcher
                         {
                             path = new Uri(window.LocationURL).LocalPath;
                         }
-                        catch { }
+                        catch (UriFormatException)
+                        {
+                            Debug.WriteLine("Path is empty\r\n");
+                        }
 
                         if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
                             currentPaths.Add(path);
@@ -502,9 +605,9 @@ namespace ExplorerWatcher
         {
             try
             {
-                if (File.Exists(saveFilePath))
+                if (File.Exists(SaveLocation))
                 {
-                    lastPaths = File.ReadAllLines(saveFilePath).Where(line => !string.IsNullOrWhiteSpace(line)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                    lastPaths = File.ReadAllLines(SaveLocation).Where(line => !string.IsNullOrWhiteSpace(line)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
                 }
                 else
                 {
@@ -534,12 +637,12 @@ namespace ExplorerWatcher
         {
             try
             {
-                if (!File.Exists(saveFilePath))
-                    File.WriteAllLines(saveFilePath, new string[0]);
+                if (!File.Exists(SaveLocation))
+                    File.WriteAllLines(SaveLocation, new string[0]);
 
-                Process.Start("notepad.exe", saveFilePath);
+                Process.Start("notepad.exe", SaveLocation);
             }
-            catch { }
+            catch (UriFormatException) { Debug.WriteLine("Path is empty\r\n"); }
         }
 
         static void Exit()
