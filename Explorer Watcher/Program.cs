@@ -22,8 +22,7 @@ namespace Explorer_Watcher
         private static int AutoSaveIntervalMilliseconds = AutoSaveIntervalSeconds * 1000;
 
         static ToolStripMenuItem intervalMenu = new ToolStripMenuItem("Autosave interval");
-
-        static private ToolStripMenuItem customIntervalItem;
+        static ToolStripMenuItem saveLocationMenu = new ToolStripMenuItem("Save directory");
 
         static NotifyIcon trayIcon;
         static List<string> lastPaths = new List<string>();
@@ -111,7 +110,10 @@ namespace Explorer_Watcher
             }
 
             intervalMenu.DropDownOpening += (s, e) => UpdateIntervalMenu();
+            saveLocationMenu.DropDownOpening += (s, e) => UpdateSaveLocationMenu();
             countdown = AutoSaveIntervalSeconds;
+            UpdateIntervalMenu();
+            UpdateSaveLocationMenu();
 
             InitExplorerWindowWatcher();
 
@@ -169,6 +171,7 @@ namespace Explorer_Watcher
 
                 BuildContextMenu(); 
                 UpdateIntervalMenu();
+                UpdateSaveLocationMenu();
                 UpdateIcon();
             }
             catch
@@ -264,15 +267,27 @@ namespace Explorer_Watcher
 
             intervalMenu.DropDownItems.Clear();
 
-            AddPreset("30 sec", 30);
-            AddPreset("1 min", 60);
-            AddPreset("2 min", 120);
-            AddPreset("5 min", 300);
-            AddPreset("10 min", 600);
+            AddIntervalPreset("30 sec", 30);
+            AddIntervalPreset("1 min", 60);
+            AddIntervalPreset("2 min", 120);
+            AddIntervalPreset("5 min", 300);
+            AddIntervalPreset("10 min", 600);
 
             if (!contextMenu.Items.Contains(intervalMenu))
             {
                 contextMenu.Items.Add(intervalMenu);
+            }
+
+            contextMenu.Items.Add(new ToolStripSeparator());
+
+            saveLocationMenu.DropDownItems.Clear();
+
+            AddSaveLocationPreset("Temp folder", "temp");
+            AddSaveLocationPreset("Program folder", "program");
+
+            if (!contextMenu.Items.Contains(saveLocationMenu))
+            {
+                contextMenu.Items.Add(saveLocationMenu);
             }
 
             contextMenu.Items.Add(new ToolStripSeparator());
@@ -293,14 +308,13 @@ namespace Explorer_Watcher
             contextMenu.Items.Add(clearItem);
 
             contextMenu.Items.Add("Exit", null, (s, e) => Exit()); 
-            Debug.WriteLine($"IntervalMenu Create: {intervalMenu.Text} - HashCode: {intervalMenu.GetHashCode()}");
-
 
             UpdateCountdown(); 
             UpdateIntervalMenu();
+            UpdateSaveLocationMenu();
         }
 
-        static void AddPreset(string label, int seconds)
+        static void AddIntervalPreset(string label, int seconds)
         {
             var item = new ToolStripMenuItem(label) { Tag = seconds };
             item.CheckOnClick = false;
@@ -313,6 +327,27 @@ namespace Explorer_Watcher
                 AppSettings.Save();
             };
             intervalMenu.DropDownItems.Add(item);
+        }
+
+        static void AddSaveLocationPreset(string label, string location)
+        {
+            var item = new ToolStripMenuItem(label) { Tag = location };
+            item.CheckOnClick = false;
+            item.Click += (s, e) =>
+            {
+                if (location == "temp")
+                {
+                    SaveLocation = Path.Combine(Path.GetTempPath(), "ExplorerWatcher", "last_paths.txt");
+                }
+                else if (location == "program")
+                {
+                    SaveLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "last_paths.txt");
+                }
+                UpdateSaveLocationMenu();
+                AppSettings.SetParameter("SaveLocation", location);
+                AppSettings.Save();
+            };
+            saveLocationMenu.DropDownItems.Add(item);
         }
 
         static string GetFolderNameOrDrive(string path)
@@ -341,6 +376,17 @@ namespace Explorer_Watcher
                 if (item.Tag is int seconds)
                 {
                     item.Checked = (seconds == AutoSaveIntervalSeconds);
+                }
+            }
+        }
+
+        static void UpdateSaveLocationMenu()
+        {
+            foreach (ToolStripMenuItem item in saveLocationMenu.DropDownItems)
+            {
+                if (item.Tag is string location)
+                {
+                    item.Checked = (location == AppSettings.GetParameter<string>("SaveLocation"));
                 }
             }
         }
