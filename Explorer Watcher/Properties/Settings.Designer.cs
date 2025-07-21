@@ -38,9 +38,9 @@ namespace Explorer_Watcher.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("60")]
-        public uint AutoSaveIntervalSeconds {
+        public int AutoSaveIntervalSeconds {
             get {
-                return ((uint)(this["AutoSaveIntervalSeconds"]));
+                return ((int)(this["AutoSaveIntervalSeconds"]));
             }
             set {
                 this["AutoSaveIntervalSeconds"] = value;

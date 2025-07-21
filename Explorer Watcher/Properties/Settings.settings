@@ -5,7 +5,7 @@
     <Setting Name="SaveLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="AutoSaveIntervalSeconds" Type="System.UInt32" Scope="User">
+    <Setting Name="AutoSaveIntervalSeconds" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">60</Value>
     </Setting>
   </Settings>

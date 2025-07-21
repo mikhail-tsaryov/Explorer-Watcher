@@ -24,7 +24,7 @@ namespace Explorer_Watcher
         {
             Properties.Settings.Default[parameter] = value;
         }
-        public void SetParameter(string parameter, uint value)
+        public void SetParameter(string parameter, int value)
         {
             Properties.Settings.Default[parameter] = value;
         }
