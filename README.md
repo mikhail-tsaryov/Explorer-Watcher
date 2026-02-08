@@ -36,7 +36,7 @@
 
 * Uses the COM interface `SHDocVw.ShellWindows` to get the list of Explorer windows.  
 * Developed in C# using WinForms for the tray icon and context menu.  
-* Paths are saved to `%TEMP%\ExplorerWatcher\EW_paths_#.txt`, where `#` is the save number (1–10).
+* Paths are saved to the TEMP folder or the program folder. The filename is EW_paths_#.txt, where # is the save number (1–10).
 
 ---
 
@@ -78,5 +78,5 @@
 
 * Используется COM-интерфейс `SHDocVw.ShellWindows` для получения списка окон проводника.  
 * Программа реализована на C# с использованием WinForms для иконки в трее и контекстного меню.  
-* Пути сохраняются в файлы `%TEMP%\ExplorerWatcher\EW_paths_#.txt`, где `#` — номер сохранения (1–10).
+* Пути сохраняются в папку TEMP или в папку программы. Имя файла — EW_paths_#.txt, где # — номер сохранения (1–10).
 
